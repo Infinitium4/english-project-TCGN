@@ -1,0 +1,11 @@
+{
+  "Connexion": "Aucun service d’authentification n’est connecté à cette présentation. Vous pouvez explorer les vues du dashboard sans compte ni mot de passe.",
+  "Documentation": "Le parcours cible : décrivez votre application et votre budget, précisez les contraintes de localisation et de sécurité, puis examinez une proposition d’architecture. Les intégrations de déploiement ne sont pas connectées à ce site.",
+  "API": "Les API et intégrations font partie de l’architecture envisagée. Aucun endpoint public, schéma d’API ou accès de production n’est disponible dans ce projet.",
+  "Status": "Aucune infrastructure de production n’est connectée. Ce site ne peut pas confirmer l’état de services cloud réels.",
+  "Blog": "Le cloud autonome européen : relier applications, ressources de calcul et exploitation grâce à une couche DevOps intelligente. Le site présente le concept ; aucune publication externe n’est disponible.",
+  "Carrières": "Aucune offre de recrutement n’est publiée dans ce projet. Pour évoquer votre profil, vous pouvez préparer une fiche via le formulaire de contact.",
+  "Confidentialité": "Les informations du formulaire sont transmises à notre serveur pour générer votre fiche projet. Elles ne sont pas enregistrées par cette application et ne sont pas envoyées par email. Les journaux techniques du serveur dépendent de la configuration de votre hébergeur. Les polices sont chargées depuis Google Fonts.",
+  "Mentions légales": "TCGN est une entreprise fictive dans ce projet de présentation. Les informations sur l’éditeur, l’hébergeur et les services doivent être renseignées avant une publication commerciale.",
+  "CGU": "Ce site présente un concept de plateforme. Il ne fournit pas de service cloud opérationnel, de compte client ou d’engagement de disponibilité. Aucune commande ni aucun paiement n’est effectué."
+}

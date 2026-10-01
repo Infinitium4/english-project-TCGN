@@ -6,7 +6,7 @@ const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage({ reducedMotion: 'reduce', acceptDownloads: true });
 const errors = [];
 page.on('pageerror', error => errors.push(error.message));
-const url = process.env.TCGN_TEST_URL || 'http://localhost:5173';
+const url = process.env.TCGN_TEST_URL || 'http://localhost:8000';
 await mkdir('artifacts', { recursive: true });
 
 try {
@@ -72,7 +72,7 @@ try {
   assert.equal(download.suggestedFilename(), 'TCGN-mon-projet.txt');
   await page.getByRole('button', { name: 'Remplir une nouvelle demande' }).click();
   assert.equal(await page.getByLabel('Votre nom').inputValue(), '');
-  assert.deepEqual(mutations, []);
+  assert.deepEqual(mutations, [new URL('project.php', url.endsWith('/') ? url : `${url}/`).href]);
   await page.keyboard.press('Escape');
   for (const name of ['Documentation', 'API', 'Status', 'Blog', 'Carrières', 'Mentions légales', 'Confidentialité', 'CGU', 'Contact']) {
     await page.locator('footer').getByRole('button', { name, exact: true }).click();
@@ -81,7 +81,7 @@ try {
   }
   assert.equal(await page.locator('input[type="password"]').count(), 0);
   assert.deepEqual(errors, []);
-  console.log('PASS scenarios, dashboard, project form, download, resources and no data transmission');
+  console.log('PASS scenarios, dashboard, PHP project form, download and resources');
 } finally {
   await browser.close();
 }
