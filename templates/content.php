@@ -9,6 +9,7 @@
 <?php require __DIR__ . '/sections/equipes.php'; ?>
 <?php require __DIR__ . '/sections/dashboard.php'; ?>
 <?php require __DIR__ . '/sections/casino.php'; ?>
+<?php require __DIR__ . '/sections/fps.php'; ?>
 <?php require __DIR__ . '/sections/souverainete.php'; ?>
 <?php require __DIR__ . '/sections/securite.php'; ?>
 <?php require __DIR__ . '/sections/cas-usage.php'; ?>

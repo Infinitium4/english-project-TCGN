@@ -1,5 +1,5 @@
 ﻿<section id="casino" class="casino-section" aria-labelledby="casino-title"><div class="container">
-<div class="club-heading"><div><p class="club-label">TCGN / ARCADE CLUB</p><h2 id="casino-title">Entrez dans le jeu<span>.</span></h2><p>Six jeux. Une seule salle. A vous de jouer.</p></div><div class="club-wallet">VOTRE RESERVE<strong><span id="casino-balance">1 000</span> <small>jetons</small></strong><button id="casino-reset" type="button">Nouvelle session</button></div></div>
+<div class="club-heading"><div><p class="club-label">TCGN / ARCADE CLUB</p><h2 id="casino-title">Entrez dans le jeu<span>.</span></h2><p>Dix jeux. Une seule salle. A vous de jouer.</p></div><div class="club-wallet">VOTRE RESERVE<strong><span id="casino-balance">1 000</span> <small>jetons</small></strong><button id="casino-reset" type="button">Nouvelle session</button></div></div>
 <div class="club-banner"><span>✦ SALON 3D</span><span>Jetons fictifs · Aucun argent reel · Aucun achat</span></div>
 <div class="club-games" role="group" aria-label="Choisir un jeu">
 <button data-game="slots" type="button" aria-pressed="true"><span class="club-art purple">7 7 7</span><small>01 / CHANCE</small><strong>Lucky Slots</strong><span>Alignez les symboles ↗</span></button>
@@ -8,6 +8,9 @@
 <button data-game="dice" type="button" aria-pressed="false"><span class="club-art mint">⚄ ⚂</span><small>04 / CHANCE</small><strong>Lucky Dice</strong><span>Deux des, une prediction ↗</span></button>
 <button data-game="memory" type="button" aria-pressed="false"><span class="club-art blue">◆ ★ ◆</span><small>05 / MEMOIRE</small><strong>Neon Memory</strong><span>Retrouvez les six paires ↗</span></button>
 <button data-game="higher" type="button" aria-pressed="false"><span class="club-art rose">↑ 8 ↓</span><small>06 / PREDICTION</small><strong>High / Low</strong><span>Plus haut ou plus bas ? ↗</span></button>
-</div>
+<button data-game="plinko" type="button" aria-pressed="false"><span class="club-art gold">&#9679;</span><small>07 / REBONDS</small><strong>Plinko</strong><span>Suivez la bille &#8599;</span></button>
+<button data-game="wheel" type="button" aria-pressed="false"><span class="club-art gold">&#10022;</span><small>08 / CHANCE</small><strong>Roue des lots</strong><span>Tournez pour gagner &#8599;</span></button>
+<button data-game="scratch" type="button" aria-pressed="false"><span class="club-art gold">&#9733;</span><small>09 / MYSTERE</small><strong>Golden Ticket</strong><span>Revelez vos symboles &#8599;</span></button>
+<button data-game="mines" type="button" aria-pressed="false"><span class="club-art gold">&#9670;</span><small>10 / AUDACE</small><strong>Diamond Hunt</strong><span>Trouvez les diamants &#8599;</span></button></div>
 <div class="club-table"><div class="club-table-top"><div><p class="club-label">A VOUS DE JOUER</p><h3 id="club-title">Lucky Slots</h3></div><label for="casino-bet">Votre mise<select id="casino-bet"><option value="10">10 jetons</option><option value="25">25 jetons</option><option value="50">50 jetons</option><option value="100">100 jetons</option></select></label></div><div id="club-stage"></div><div id="club-actions"></div><p id="casino-result" role="status" aria-live="polite"></p><details open><summary>Regles de cette table</summary><p id="club-rules"></p></details></div>
 <noscript>Activez JavaScript pour jouer.</noscript></div></section>
