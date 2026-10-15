@@ -5,7 +5,7 @@ $resources = json_decode(file_get_contents(__DIR__ . '/../config/resources.json'
 ?>
 <!doctype html>
 <html lang="fr">
-<head><?php require __DIR__ . '/../templates/head.php'; ?><script src="assets/app.js" defer></script></head>
+<head><?php require __DIR__ . '/../templates/head.php'; ?><script src="assets/app.js" defer></script><script src="assets/casino.js" defer></script></head>
 <body>
 <a class="skip-link" href="#contenu">Aller au contenu</a>
 <?php require __DIR__ . '/../templates/header.php'; ?>

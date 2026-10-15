@@ -19,3 +19,5 @@
 <link rel="stylesheet" href="assets/index.css">
 <link rel="stylesheet" href="assets/autonomous.css">
 
+
+<link rel="stylesheet" href="assets/casino.css">
