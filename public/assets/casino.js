@@ -1,60 +1,43 @@
-'use strict';
-
+﻿'use strict';
 (() => {
-  const form = document.querySelector('#casino-form');
-  if (!form) return;
-  const bet = document.querySelector('#casino-bet');
-  const spin = document.querySelector('#casino-spin');
-  const reset = document.querySelector('#casino-reset');
-  const balanceLabel = document.querySelector('#casino-balance');
-  const result = document.querySelector('#casino-result');
-  const reels = document.querySelector('.casino-reels');
-  const symbols = ['7', '★', '◆', '♣', '♥'];
-  let balance = 1000;
-  let busy = false;
-  function render() {
-    balanceLabel.textContent = balance.toLocaleString('fr-FR');
-    spin.disabled = busy || balance < Number(bet.value);
-    bet.disabled = busy;
-    reset.disabled = busy;
-  }
-  bet.addEventListener('change', render);
-  form.addEventListener('submit', async event => {
-    event.preventDefault();
-    const stake = Number(bet.value);
-    if (busy || ![10, 25, 50, 100].includes(stake) || balance < stake) return;
-    busy = true;
-    balance -= stake;
-    render();
-    result.textContent = 'Les rouleaux tournent…';
-    reels.classList.add('is-spinning');
-    const draw = () => {
-      const value = new Uint32Array(1);
-      do { crypto.getRandomValues(value); } while (value[0] >= 4294967295);
-      return symbols[value[0] % symbols.length];
-    };
-    const values = Array.from({ length: 3 }, draw);
-    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      await new Promise(resolve => setTimeout(resolve, 700));
-    }
-    [...reels.children].forEach((reel, index) => { reel.textContent = values[index]; });
-    reels.setAttribute('aria-label', `Rouleaux : ${values.join(', ')}`);
-    reels.classList.remove('is-spinning');
-    const distinct = new Set(values).size;
-    const multiplier = distinct === 1 ? (values[0] === '7' ? 20 : 8) : distinct === 2 ? 2 : 0;
-    const gain = stake * multiplier;
-    balance += gain;
-    result.textContent = gain ? `${multiplier === 20 ? 'Jackpot ! ' : ''}${gain} jetons remportés !` : 'Pas de combinaison cette fois. La mise est perdue.';
-    if (balance < 10) result.textContent += ' Réserve épuisée : recommencez pour rejouer.';
-    else if (balance < stake) result.textContent += ' Choisissez une mise plus petite pour continuer.';
-    busy = false;
-    render();
-  });
-  reset.addEventListener('click', () => {
-    if (busy) return;
-    balance = 1000;
-    result.textContent = 'Nouvelle partie : 1 000 jetons. À vous de jouer !';
-    render();
-  });
-  render();
+ const root=document.querySelector('#casino'); if(!root)return;
+ const $=s=>root.querySelector(s), stage=$('#club-stage'), actions=$('#club-actions'), result=$('#casino-result'), bet=$('#casino-bet');
+ let balance=1000, game='slots', busy=false, active=false, stake=0, hand=[], dealer=[], deck=[], flips=[], found=[], turns=0, reference=8;
+ const symbols=['7','\u2605','\u25c6','\u2663','\u2665'];
+ const games={slots:['Lucky Slots','Trois 7 : x20. Autre trio : x8. Paire : x2. Cinq symboles equiprobables sur chaque rouleau.'],roulette:['Roulette','37 numeros (0 a 36). Rouge ou noir : x2. Zero : x36. Le zero fait perdre les couleurs.'],blackjack:['Blackjack','Battez le croupier sans depasser 21. As : 1 ou 11. Figures : 10. Le croupier reste a 17. Victoire : x2, egalite : mise rendue. Un jeu de 52 cartes melange par manche, sans double ni assurance.'],dice:['Lucky Dice','Deux des a six faces. Somme 2 a 6 ou 8 a 12 : x2. Exactement 7 : x5.'],memory:['Neon Memory','Trouvez six paires en 12 essais pour gagner x3. Un essai = deux cartes. Terminez la partie avant de changer de table.'],higher:['High / Low','Predisez la prochaine carte (1 a 13). Bonne prediction : x2. Egalite : mise rendue. Tirages independants. La derniere carte devient la reference.']};
+ function rnd(n){const a=new Uint32Array(1),limit=Math.floor(4294967296/n)*n;do{crypto.getRandomValues(a);}while(a[0]>=limit);return a[0]%n;}
+ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
+ const pause=()=>new Promise(r=>setTimeout(r,matchMedia('(prefers-reduced-motion: reduce)').matches?0:650));
+ function controls(){ $('#casino-balance').textContent=balance.toLocaleString('fr-FR');bet.disabled=busy||active;root.querySelectorAll('[data-game],#casino-reset').forEach(b=>b.disabled=busy||active);actions.querySelectorAll('button').forEach(b=>b.disabled=busy);}
+ function buttons(items){actions.innerHTML=items.map(([id,text])=>`<button type="button" data-action="${id}">${text}</button>`).join('');controls();}
+ function begin(){stake=Number(bet.value);if(busy||active||![10,25,50,100].includes(stake))return false;if(balance<stake){result.textContent='Jetons insuffisants : reduisez la mise ou ouvrez une nouvelle session.';return false;}balance-=stake;busy=true;controls();return true;}
+ function finish(m,text){balance+=stake*m;busy=false;active=false;result.textContent=text+' '+(m?`${stake*m} jetons credites.`:'Mise perdue.')+(balance<10?' Nouvelle session disponible pour rejouer.':'');controls();}
+ const card=t=>`<span class="club-card">${t}</span>`;
+ function show(){ $('#club-title').textContent=games[game][0];$('#club-rules').textContent=games[game][1]+' Les gains incluent la mise. Jetons sans valeur monetaire.';result.textContent='Choisissez votre mise et lancez la partie.';root.querySelectorAll('[data-game]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.game===game)));
+ if(game==='slots'){stage.innerHTML='<div class="slot-machine"><p>LUCKY CLOUD / 777</p><div class="club-reels" role="img" aria-label="Trois rouleaux"><span>7</span><span>★</span><span>◆</span></div><p>JACKPOT x20</p></div>';buttons([['spin','Lancer les rouleaux ↗']]);}
+ if(game==='roulette'){stage.innerHTML='<div class="wheel-scene"><span class="wheel-pointer">▼</span><div class="club-wheel"><strong id="wheel-number">?</strong></div></div>';buttons([['red','Rouge x2'],['black','Noir x2'],['zero','Zero x36']]);}
+ if(game==='dice'){stage.innerHTML='<div class="club-dice" role="img" aria-label="Deux des"><span>⚄</span><span>⚂</span></div>';buttons([['low','2 a 6 · x2'],['seven','7 · x5'],['high','8 a 12 · x2']]);}
+ if(game==='blackjack'){stage.innerHTML='<div class="card-scene">'+card('A♠')+card('K♥')+'</div>';buttons([['deal','Distribuer ↗']]);}
+ if(game==='memory'){stage.innerHTML='<div class="card-scene">'+card('◆')+card('?')+card('◆')+'</div>';buttons([['memory','Commencer · 12 essais ↗']]);}
+ if(game==='higher'){reference=rnd(13)+1;stage.innerHTML='<div class="card-scene">'+card(reference)+card('?')+'</div>';buttons([['up','Plus haute ↑'],['down','Plus basse ↓']]);}controls();}
+ function total(cards){let sum=cards.reduce((s,c)=>s+Math.min(c.rank,10),0),aces=cards.filter(c=>c.rank===1).length;while(aces--&&sum+10<=21)sum+=10;return sum;}
+ function cardsHTML(cards){return cards.map(c=>card(`${({1:'A',11:'J',12:'Q',13:'K'})[c.rank]||c.rank}${c.suit}`)).join('');}
+ function handView(reveal=false){stage.innerHTML=`<div class="blackjack-table"><p>CROUPIER · ${reveal?total(dealer):'?'}</p><div class="card-row">${reveal?cardsHTML(dealer):cardsHTML(dealer.slice(0,1))+card('?')}</div><p>VOUS · ${total(hand)}</p><div class="card-row">${cardsHTML(hand)}</div></div>`;}
+ async function stand(){busy=true;controls();while(total(dealer)<17)dealer.push(deck.pop());await pause();handView(true);const p=total(hand),d=total(dealer);finish(p>21?0:d>21||p>d?2:p===d?1:0,p>21?'Vous depassez 21.':d>21?'Le croupier depasse 21 !':p>d?'Vous gagnez !':p===d?'Egalite.':'Le croupier gagne.');buttons([['deal','Nouvelle main ↗']]);}
+ function memoryView(){stage.innerHTML=`<div class="memory-board">${deck.map((s,i)=>`<button type="button" data-memory="${i}" class="${found.includes(i)||flips.includes(i)?'flipped':''}" aria-label="${found.includes(i)?'Paire trouvee '+s:flips.includes(i)?s:'Carte cachee '+(i+1)}" ${found.includes(i)||flips.includes(i)||busy?'disabled':''}>${found.includes(i)||flips.includes(i)?s:'?'}</button>`).join('')}</div>`;}
+ root.addEventListener('click',async e=>{
+ const selection=e.target.closest('[data-game]');if(selection&&!busy&&!active){game=selection.dataset.game;show();return;}
+ if(e.target.closest('#casino-reset')&&!busy&&!active){balance=1000;show();result.textContent='Nouvelle session : 1 000 jetons offerts.';return;}
+ const memory=e.target.closest('[data-memory]');if(memory&&game==='memory'&&active&&!busy){const i=Number(memory.dataset.memory);if(found.includes(i)||flips.includes(i))return;flips.push(i);memoryView();if(flips.length===2){turns++;busy=true;controls();memoryView();await pause();if(deck[flips[0]]===deck[flips[1]])found.push(...flips);flips=[];busy=false;memoryView();if(found.length===12||turns>=12){finish(found.length===12?3:0,found.length===12?'Les six paires sont reunies !':'Les 12 essais sont ecoules.');stage.querySelectorAll('button').forEach(b=>b.disabled=true);buttons([['memory','Rejouer ↗']]);}else{result.textContent=`${found.length/2}/6 paires · ${12-turns} essais restants.`;controls();}}return;}
+ const action=e.target.closest('[data-action]')?.dataset.action;if(!action||busy)return;
+ if(game==='blackjack'&&active){if(action==='hit'){hand.push(deck.pop());handView();if(total(hand)>=21)await stand();}else if(action==='stand')await stand();return;}
+ if(!begin())return;
+ if(game==='memory'){deck=shuffle([...symbols,'☀',...symbols,'☀']);flips=[];found=[];turns=0;busy=false;active=true;buttons([]);memoryView();result.textContent='Trouvez six paires en 12 essais.';return;}
+ if(game==='blackjack'){deck=shuffle(['♠','♥','♦','♣'].flatMap(suit=>Array.from({length:13},(_,i)=>({rank:i+1,suit}))));hand=[deck.pop(),deck.pop()];dealer=[deck.pop(),deck.pop()];busy=false;active=true;handView();buttons([['hit','Tirer une carte'],['stand','Rester']]);result.textContent='Tirer ou rester ?';if(total(hand)===21)await stand();return;}
+ result.textContent='Le jeu est lance…';stage.classList.add('is-playing');await pause();stage.classList.remove('is-playing');
+ if(game==='slots'){const v=Array.from({length:3},()=>symbols[rnd(5)]),size=new Set(v).size;stage.querySelectorAll('.club-reels span').forEach((el,i)=>el.textContent=v[i]);stage.querySelector('.club-reels').setAttribute('aria-label',v.join(', '));const m=size===1?(v[0]==='7'?20:8):size===2?2:0;finish(m,m===20?'Jackpot !':m?'Belle combinaison !':'Aucune combinaison.');}
+ if(game==='roulette'){const n=rnd(37),red=[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(n),color=n===0?'zero':red?'red':'black';$('#wheel-number').textContent=n;$('#wheel-number').style.background=color==='red'?'#b83c60':color==='zero'?'#188364':'#171a28';finish(action===color?(color==='zero'?36:2):0,`${n} · ${color==='zero'?'zero':red?'rouge':'noir'}.`);}
+ if(game==='dice'){const a=rnd(6)+1,b=rnd(6)+1,s=a+b;stage.querySelectorAll('.club-dice span').forEach((el,i)=>el.textContent=String.fromCodePoint(0x267f+(i?b:a)));stage.querySelector('.club-dice').setAttribute('aria-label',`${a} et ${b}, somme ${s}`);finish(action==='low'&&s<7||action==='high'&&s>7?2:action==='seven'&&s===7?5:0,`${a} + ${b} = ${s}.`);}
+ if(game==='higher'){const n=rnd(13)+1,win=action==='up'?n>reference:n<reference;stage.innerHTML='<div class="card-scene">'+card(reference)+card(n)+'</div>';finish(n===reference?1:win?2:0,n===reference?'Egalite.':win?'Bien predit !':'Prediction manquee.');reference=n;result.textContent+=` Prochaine reference : ${n}.`;}
+ });show();
 })();
